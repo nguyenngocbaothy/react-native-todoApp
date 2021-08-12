@@ -13,10 +13,12 @@ import useColorScheme from '../hooks/useColorScheme';
 import TabOneScreen from '../screens/TabOneScreen';
 import TabTwoScreen from '../screens/TabTwoScreen';
 import { BottomTabParamList, TabOneParamList, TabTwoParamList } from '../types';
+import { TouchableOpacity, Alert } from 'react-native';
+import { clearAll } from '../constants/User';
 
 const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 
-export default function BottomTabNavigator() {
+export default function BottomTabNavigator({ navigation }) {
   const colorScheme = useColorScheme();
 
   return (
@@ -24,27 +26,48 @@ export default function BottomTabNavigator() {
       initialRouteName="TabOne"
       tabBarOptions={{ activeTintColor: Colors[colorScheme].tint }}>
       <BottomTab.Screen
-        name="TabOne"
+        name="Todo list"
         component={TabOneNavigator}
         options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="create-outline" color={color} />,
         }}
       />
       <BottomTab.Screen
-        name="TabTwo"
+        name="Logout"
         component={TabTwoNavigator}
         options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="exit-outline" color={color} />,
+          tabBarButton: (props) => {
+            return (
+              <TouchableOpacity  {...props}
+                onPress={() => {
+                  return Alert.alert(
+                    'Confirmation required',
+                    'Do you really want to logout?',
+                    [
+                      { text: 'Cancel' },
+                      {
+                        text: 'Accept', onPress: async () => {
+                          await clearAll()
+                          navigation.navigate("Login")
+                        }
+                      },
+                    ]
+                  )
+                }} />
+            )
+          },
         }}
       />
     </BottomTab.Navigator>
   );
 }
 
+
 // You can explore the built-in icon families and icons on the web at:
 // https://icons.expo.fyi/
 function TabBarIcon(props: { name: React.ComponentProps<typeof Ionicons>['name']; color: string }) {
-  return <Ionicons size={30} style={{ marginBottom: -3 }} {...props} />;
+  return <Ionicons size={25} style={{ marginBottom: -3 }} {...props} />;
 }
 
 // Each tab has its own navigation stack, you can read more about this pattern here:
@@ -55,9 +78,9 @@ function TabOneNavigator() {
   return (
     <TabOneStack.Navigator>
       <TabOneStack.Screen
-        name="TabOneScreen"
+        name="TodoLististScreen"
         component={TabOneScreen}
-        options={{ headerTitle: 'Tab One Title' }}
+        options={{ headerTitle: 'To do list', headerLeft: () => null }}
       />
     </TabOneStack.Navigator>
   );
